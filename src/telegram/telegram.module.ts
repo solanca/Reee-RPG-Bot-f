@@ -17,6 +17,7 @@ import { MissionsModule } from './missions/missions.module';
       inject: [ConfigService]
     }),
     MissionsModule
-  ]
+  ],
+  exports: [TelegramService]
 })
 export class TelegramModule {}
