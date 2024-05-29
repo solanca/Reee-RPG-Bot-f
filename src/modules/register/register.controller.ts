@@ -10,7 +10,7 @@ export class RegisterController {
     @Post('retrieve-nfts')
     async retrieveNFTs(@Body() publicKeyDto: PublicKeyDto) {
         const warriorList = await this.registerService.retrieveNFTs(publicKeyDto);
-        this.telegramService.listWarriors(publicKeyDto, warriorList);
+        this.telegramService.listWarriors(warriorList);
         return publicKeyDto;
     }
 }

@@ -2,7 +2,9 @@ export class WarriorDto {
     readonly address: string;
     readonly xp: number;
     readonly level: number;
-    readonly weapon: number;
-    readonly armor: number;
-    readonly assets: number;
+    readonly weapon: string;
+    readonly armor: string;
+    readonly assets: string;
+    readonly image: string;
+    readonly description: string;
 }
