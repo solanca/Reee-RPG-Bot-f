@@ -93,7 +93,29 @@ export class RegisterService {
         return existWarrior;
     }
 
+    async update(warriorDto: WarriorDto): Promise<Warrior | null> {
+        const updatedWarrior = await this.warriorModel.findOneAndUpdate(
+            { address: warriorDto.address },
+            warriorDto,
+            { new: true }
+        ).exec();
+        return updatedWarrior;
+    }
+
     async findByAddress(address: string): Promise<Warrior | null> {
         return this.warriorModel.findOne({ address }).exec();
+    }
+
+    toWarriorDto(warrior: Warrior): WarriorDto {
+        return {
+            address: warrior.address,
+            xp: warrior.xp,
+            level: warrior.level,
+            weapon: warrior.weapon,
+            armor: warrior.armor,
+            assets: warrior.assets,
+            image: warrior.image,
+            description: warrior.description,
+        };
     }
 }

@@ -12,7 +12,7 @@ export class TelegramService {
     warriorMap = new Map<string, WarriorDto>();
 
     constructor(@InjectBot() private readonly bot: Telegraf, 
-        private readonly missionsService: TgmissionsService, private readonly registerService: RegisterService) {
+        private readonly tgmissionsService: TgmissionsService, private readonly registerService: RegisterService) {
         this.initBot();
     }
 
@@ -27,8 +27,8 @@ export class TelegramService {
             // await ctx.reply(message, mainMenu)
         });
         this.bot.action(/register_warrior (.*?)/, (ctx) => this.registerWarrior(ctx, this.warriorMap));
-
-        this.missionsService.initBot(this.bot);
+        // Initialize - Mission Bot
+        this.tgmissionsService.initBot(this.bot);
     }
 
     public replyWithText(msg: string) {
@@ -41,12 +41,14 @@ export class TelegramService {
         if (this.context !== undefined && this.context !== null) {
             this.warriorMap.clear();
             warriors.forEach(async (warrior) => {
-                this.warriorMap.set(warrior.address, warrior);
+                const warriorFromDb = await this.registerService.findByAddress(warrior.address);
+                const warriorDto = warriorFromDb === null ? warrior : this.registerService.toWarriorDto(warriorFromDb);
+                this.warriorMap.set(warriorDto.address, warriorDto);
                 const select_warrior_markup = Markup.inlineKeyboard([
-                    Markup.button.callback(`Select Warrior`, `register_warrior ${warrior.address}`),
+                    Markup.button.callback(`Select Warrior`, `register_warrior ${warriorDto.address}`),
                 ]);
-                await this.context.replyWithPhoto(warrior.image, { 
-                    caption: `${warrior.description} \n\nExpreience: ${warrior.xp} \nLevel: ${warrior.level} \nWepon: ${warrior.weapon} \nArmor: ${warrior.armor}`, 
+                await this.context.replyWithPhoto(warriorDto.image, { 
+                    caption: `${warriorDto.description} \n\nExpreience: ${warriorDto.xp} \nLevel: ${warriorDto.level} \nWepon: ${warriorDto.weapon} \nArmor: ${warriorDto.armor}`, 
                     reply_markup: select_warrior_markup.reply_markup 
                 });
             });
@@ -57,6 +59,8 @@ export class TelegramService {
         const [ warriorId ] = ctx["match"]["input"].replace(/register_warrior /g, '').split(' ');
         const warrior = warriorMap.get(warriorId);
         await this.registerService.create(warrior);
+        // Update mission bot warrior
+        this.tgmissionsService.warriorDto = warrior;
         await ctx.reply('You just selected Warrior. Below is warrior info:');
         await ctx.replyWithPhoto(warrior.image, {
             caption: `${warrior.description} \n\nExpreience: ${warrior.xp} \nLevel: ${warrior.level} \nWepon: ${warrior.weapon} \nArmor: ${warrior.armor}`
