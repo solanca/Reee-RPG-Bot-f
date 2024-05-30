@@ -4,12 +4,52 @@ import { WarriorDto } from './dto/warrior.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Warrior, WarriorDocument } from 'src/schemas/warrior.schema';
 import { Model } from 'mongoose';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { Metaplex } from '@metaplex-foundation/js';
 
 @Injectable()
 export class RegisterService {
-    constructor(@InjectModel(Warrior.name) private warriorModel: Model<WarriorDocument>) {}
+    private connection: Connection;
+    private metaplex: Metaplex;
+
+    constructor(@InjectModel(Warrior.name) private warriorModel: Model<WarriorDocument>) {
+        this.connection = new Connection("https://api.devnet.solana.com", "confirmed");
+        this.metaplex = new Metaplex(this.connection);
+    }
 
     async retrieveNFTs(publicKeyDto: PublicKeyDto): Promise<WarriorDto[]> {
+        try {
+            // const walletPublicKey = new PublicKey(publicKeyDto.address);
+
+            // const tokenAccounts = await this.connection.getParsedTokenAccountsByOwner(walletPublicKey, {
+            //   programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
+            // });
+      
+            // const nfts = tokenAccounts.value.filter(tokenAccount => {
+            //     console.log(tokenAccount.account.data.parsed);
+            //   const tokenAmount = tokenAccount.account.data.parsed.info.tokenAmount;
+            //   return tokenAmount.amount === '1' && tokenAmount.decimals === 0;
+            // });
+      
+            // const nftsArr = tokenAccounts.value.map(nft => ({
+            //   mint: nft.account.data.parsed.info.mint,
+            //   tokenAccount: nft.pubkey.toBase58(),
+            // }));
+
+            // const candyMachinePubkey = new PublicKey("BrwCS4qwuKwu9TbmKQ83N7YN8Bx5iht3yYg7yCsK8dNw");
+
+            // console.log("candyMachinePubKey ========= ", candyMachinePubkey);
+
+            // const metadataAccounts = await this.metaplex.candyMachinesV2().findMintedNfts({ candyMachine: candyMachinePubkey });
+            
+            // console.log("metadataAccounts   ====  ", metadataAccounts);
+
+            // console.log("nftsArr ====== ", nftsArr);
+          } catch (error) {
+            console.error('Failed to retrieve NFTs:', error);
+            throw new Error('Failed to retrieve NFTs');
+          }
+
         return [
             {
                 address: "6Dg6Q5vbpwtP32CLbadRehPqu5YkfvcmpTBv9BcHrHBj",

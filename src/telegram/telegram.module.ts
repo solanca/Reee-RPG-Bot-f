@@ -3,8 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { TelegramService } from './telegram.service';
 import { TelegramController } from './telegram.controller';
-import { MissionsModule } from './missions/missions.module';
-import { RegisterService } from 'src/modules/register/register.service';
+import { TgmissionsModule } from './missions/tgmissions.module';
 import { RegisterModule } from 'src/modules/register/register.module';
 
 @Module({
@@ -18,7 +17,7 @@ import { RegisterModule } from 'src/modules/register/register.module';
       }),
       inject: [ConfigService]
     }),
-    MissionsModule,
+    TgmissionsModule,
     forwardRef(() => RegisterModule)
   ],
   exports: [TelegramService]

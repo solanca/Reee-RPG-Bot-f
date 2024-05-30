@@ -3,7 +3,7 @@ import { InjectBot } from 'nestjs-telegraf';
 import { Markup, Telegraf, Context } from 'telegraf';
 import { commands, walletRedirectURL } from './telegram.constants';
 import { WarriorDto } from 'src/modules/register/dto/warrior.dto';
-import { MissionsService } from './missions/missions.service';
+import { TgmissionsService } from './missions/tgmissions.service';
 import { RegisterService } from 'src/modules/register/register.service';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class TelegramService {
     warriorMap = new Map<string, WarriorDto>();
 
     constructor(@InjectBot() private readonly bot: Telegraf, 
-        private readonly missionsService: MissionsService, private readonly registerService: RegisterService) {
+        private readonly missionsService: TgmissionsService, private readonly registerService: RegisterService) {
         this.initBot();
     }
 
@@ -31,16 +31,21 @@ export class TelegramService {
         this.missionsService.initBot(this.bot);
     }
 
+    public replyWithText(msg: string) {
+        if (this.context !== undefined && this.context !== null) {
+            this.context.reply(msg);
+        }
+    }
+
     public listWarriors(warriors: WarriorDto[]) {
         if (this.context !== undefined && this.context !== null) {
             this.warriorMap.clear();
-            this.context.reply("Select Warrior:");
-            warriors.forEach(warrior => {
+            warriors.forEach(async (warrior) => {
                 this.warriorMap.set(warrior.address, warrior);
                 const select_warrior_markup = Markup.inlineKeyboard([
                     Markup.button.callback(`Select Warrior`, `register_warrior ${warrior.address}`),
                 ]);
-                this.context.replyWithPhoto(warrior.image, { 
+                await this.context.replyWithPhoto(warrior.image, { 
                     caption: `${warrior.description} \n\nExpreience: ${warrior.xp} \nLevel: ${warrior.level} \nWepon: ${warrior.weapon} \nArmor: ${warrior.armor}`, 
                     reply_markup: select_warrior_markup.reply_markup 
                 });
