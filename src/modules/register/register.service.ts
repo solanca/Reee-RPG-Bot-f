@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PublicKeyDto } from './dto/publickey.dto';
 import { WarriorDto } from './dto/warrior.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Warrior, WarriorDocument } from 'src/schemas/warrior.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class RegisterService {
-    constructor() {}
+    constructor(@InjectModel(Warrior.name) private warriorModel: Model<WarriorDocument>) {}
 
     async retrieveNFTs(publicKeyDto: PublicKeyDto): Promise<WarriorDto[]> {
         return [
@@ -39,5 +42,18 @@ export class RegisterService {
                 description: "Reee Warrior are an NFT collection inspired by $REEE. Royalties are used to buy back and burn $REEE!"
             },
         ];
+    }
+
+    async create(warriorDto: WarriorDto): Promise<Warrior> {
+        const existWarrior = await this.findByAddress(warriorDto.address);
+        if (existWarrior === null) {
+            const createdWarrior = new this.warriorModel(warriorDto);
+            return createdWarrior.save();
+        }
+        return existWarrior;
+    }
+
+    async findByAddress(address: string): Promise<Warrior | null> {
+        return this.warriorModel.findOne({ address }).exec();
     }
 }

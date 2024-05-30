@@ -15,11 +15,19 @@ export class Warrior {
     level: number;
     
     @Prop({required: true})
-    weapon: number;
+    weapon: string;
 
     @Prop({required: true})
-    armor: number;
+    armor: string;
 
     @Prop({required: true})
-    assets: number;
+    assets: string;
+
+    @Prop({required: true})
+    image: string;
+
+    @Prop({required: true})
+    description: string;
 }
+
+export const WarriorSchema = SchemaFactory.createForClass(Warrior);

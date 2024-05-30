@@ -4,13 +4,15 @@ import { Markup, Telegraf, Context } from 'telegraf';
 import { commands, walletRedirectURL } from './telegram.constants';
 import { WarriorDto } from 'src/modules/register/dto/warrior.dto';
 import { MissionsService } from './missions/missions.service';
+import { RegisterService } from 'src/modules/register/register.service';
 
 @Injectable()
 export class TelegramService {
     context: Context;
     warriorMap = new Map<string, WarriorDto>();
 
-    constructor(@InjectBot() private readonly bot: Telegraf, private readonly missionsService: MissionsService) {
+    constructor(@InjectBot() private readonly bot: Telegraf, 
+        private readonly missionsService: MissionsService, private readonly registerService: RegisterService) {
         this.initBot();
     }
 
@@ -31,6 +33,7 @@ export class TelegramService {
 
     public listWarriors(warriors: WarriorDto[]) {
         if (this.context !== undefined && this.context !== null) {
+            this.warriorMap.clear();
             this.context.reply("Select Warrior:");
             warriors.forEach(warrior => {
                 this.warriorMap.set(warrior.address, warrior);
@@ -45,9 +48,14 @@ export class TelegramService {
         }
     }
 
-    private registerWarrior(ctx: Context, warriorMap: Map<string, WarriorDto>) {
+    private async registerWarrior(ctx: Context, warriorMap: Map<string, WarriorDto>) {
         const [ warriorId ] = ctx["match"]["input"].replace(/register_warrior /g, '').split(' ');
-        console.log("warrior info ======== ", warriorMap.get(warriorId));
+        const warrior = warriorMap.get(warriorId);
+        await this.registerService.create(warrior);
+        await ctx.reply('You just selected Warrior. Below is warrior info:');
+        await ctx.replyWithPhoto(warrior.image, {
+            caption: `${warrior.description} \n\nExpreience: ${warrior.xp} \nLevel: ${warrior.level} \nWepon: ${warrior.weapon} \nArmor: ${warrior.armor}`
+        });
     }
 
 }
