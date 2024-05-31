@@ -4,8 +4,8 @@ import { WarriorDto } from './dto/warrior.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Warrior, WarriorDocument } from 'src/schemas/warrior.schema';
 import { Model } from 'mongoose';
-import { Connection, PublicKey } from '@solana/web3.js';
-import { Metaplex } from '@metaplex-foundation/js';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { Metaplex, keypairIdentity } from '@metaplex-foundation/js';
 
 @Injectable()
 export class RegisterService {
@@ -14,27 +14,35 @@ export class RegisterService {
 
     constructor(@InjectModel(Warrior.name) private warriorModel: Model<WarriorDocument>) {
         this.connection = new Connection("https://api.devnet.solana.com", "confirmed");
-        this.metaplex = new Metaplex(this.connection);
+        this.metaplex = new Metaplex(this.connection)
+            .use(keypairIdentity(Keypair.generate()));
     }
 
     async retrieveNFTs(publicKeyDto: PublicKeyDto): Promise<WarriorDto[]> {
         try {
-            // const walletPublicKey = new PublicKey(publicKeyDto.address);
+        //     const walletPublicKey = new PublicKey(publicKeyDto.address);
 
-            // const tokenAccounts = await this.connection.getParsedTokenAccountsByOwner(walletPublicKey, {
-            //   programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
-            // });
+        //     const tokenAccounts = await this.connection.getParsedTokenAccountsByOwner(walletPublicKey, {
+        //       programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
+        //     });
       
-            // const nfts = tokenAccounts.value.filter(tokenAccount => {
-            //     console.log(tokenAccount.account.data.parsed);
-            //   const tokenAmount = tokenAccount.account.data.parsed.info.tokenAmount;
-            //   return tokenAmount.amount === '1' && tokenAmount.decimals === 0;
-            // });
+        //     const nfts = tokenAccounts.value.filter(tokenAccount => {
+        //       const tokenAmount = tokenAccount.account.data.parsed.info.tokenAmount;
+        //       return tokenAmount.amount === '1' && tokenAmount.decimals === 0;
+        //     });
       
-            // const nftsArr = tokenAccounts.value.map(nft => ({
-            //   mint: nft.account.data.parsed.info.mint,
-            //   tokenAccount: nft.pubkey.toBase58(),
-            // }));
+        //     const nftsArr = tokenAccounts.value.map(nft => ({
+        //       mint: nft.account.data.parsed.info.mint,
+        //       tokenAccount: nft.pubkey.toBase58(),
+        //     }));
+
+        //     const mintAddress = new PublicKey("5qfHXBBHcThGmHGigUSQBLHr24x2ZTcRSn6zvT8GPeAM");
+        
+        //     const nft = await this.metaplex.nfts().findByMint({ mintAddress });
+
+        //     console.log("Connection =================== ", this.connection);
+        
+        //     console.log("nft.json  ============== ", nft.json);
 
             // const candyMachinePubkey = new PublicKey("BrwCS4qwuKwu9TbmKQ83N7YN8Bx5iht3yYg7yCsK8dNw");
 

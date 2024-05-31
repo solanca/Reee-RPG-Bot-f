@@ -20,7 +20,7 @@ export class TelegramService {
         this.bot.telegram.setMyCommands(commands);
         this.bot.command('start', async (ctx) => {
             this.context = ctx;
-            await ctx.reply('Please provide your Solana wallet address to connect, or use the link below to connect your wallet:');
+            await ctx.reply('Please use the link below to connect your wallet:');
             await ctx.replyWithHTML(walletRedirectURL);
 
             // ### Referrence
