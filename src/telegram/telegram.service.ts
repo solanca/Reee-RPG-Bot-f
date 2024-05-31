@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 export class TelegramService {
     context: Context;
     warriorMap = new Map<string, WarriorDto>();
+    owner: string;
 
     constructor(@InjectBot() private readonly bot: Telegraf, 
         private readonly tgmissionsService: TgmissionsService, 
@@ -40,8 +41,9 @@ export class TelegramService {
         }
     }
 
-    public listWarriors(warriors: WarriorDto[]) {
+    public listWarriors(owner: string, warriors: WarriorDto[]) {
         if (this.context !== undefined && this.context !== null) {
+            this.owner = owner;
             this.warriorMap.clear();
             warriors.forEach(async (warrior) => {
                 const warriorFromDb = await this.registerService.findByAddress(warrior.address);
@@ -50,7 +52,7 @@ export class TelegramService {
                 const select_warrior_markup = Markup.inlineKeyboard([
                     Markup.button.callback(`Select Warrior`, `register_warrior ${warriorDto.address}`),
                 ]);
-                await this.context.replyWithPhoto(warriorDto.image, { 
+                await this.context.replyWithPhoto(warriorDto.image.replace('?ext=png',''), { 
                     caption: `${warriorDto.description} \n\nExpreience: ${warriorDto.xp} \nLevel: ${warriorDto.level} \nWepon: ${warriorDto.weapon} \nArmor: ${warriorDto.armor}`, 
                     reply_markup: select_warrior_markup.reply_markup 
                 });
@@ -61,13 +63,15 @@ export class TelegramService {
     private async registerWarrior(ctx: Context, warriorMap: Map<string, WarriorDto>) {
         const [ warriorId ] = ctx["match"]["input"].replace(/register_warrior /g, '').split(' ');
         const warrior = warriorMap.get(warriorId);
-        await this.registerService.create(warrior);
-        // Update mission bot warrior
-        this.tgmissionsService.warriorDto = warrior;
-        await ctx.reply('You just selected Warrior. Below is warrior info:');
-        await ctx.replyWithPhoto(warrior.image, {
-            caption: `${warrior.description} \n\nExpreience: ${warrior.xp} \nLevel: ${warrior.level} \nWepon: ${warrior.weapon} \nArmor: ${warrior.armor}`
-        });
+        if (warrior !== null && warrior !== undefined) {
+            await this.registerService.create({...warrior, owner: this.owner});
+            // Update mission bot warrior
+            this.tgmissionsService.warriorDto = warrior;
+            await ctx.reply('You just selected Warrior. Below is warrior info:');
+            await ctx.replyWithPhoto(warrior.image.replace('?ext=png',''), {
+                caption: `${warrior.description} \n\nExpreience: ${warrior.xp} \nLevel: ${warrior.level} \nWepon: ${warrior.weapon} \nArmor: ${warrior.armor}`
+            });
+        }
     }
 
 }

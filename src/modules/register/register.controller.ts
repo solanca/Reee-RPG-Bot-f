@@ -11,7 +11,7 @@ export class RegisterController {
     async retrieveNFTs(@Body() publicKeyDto: PublicKeyDto) {
         const warriorList = await this.registerService.retrieveNFTs(publicKeyDto);
         await this.telegramService.replyWithText("Just fetching your warriors from your wallet. Please wait...");
-        await this.telegramService.listWarriors(warriorList);
+        await this.telegramService.listWarriors(publicKeyDto.address, warriorList);
         return publicKeyDto;
     }
 }

@@ -9,6 +9,12 @@ export class Warrior {
     address: string;
 
     @Prop({required: true})
+    owner: string;
+
+    @Prop({required: true})
+    name: string;
+
+    @Prop({required: true})
     xp: number;
 
     @Prop({required: true})
