@@ -8,5 +8,3 @@ export const commands = [
     { command: 'leaderboard', description: 'View the top players.' },
     { command: 'event', description: 'Participate in ongoing community events.' },
 ];
-
-export const walletRedirectURL = "http://198.18.5.108:5173/";

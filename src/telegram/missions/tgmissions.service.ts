@@ -23,7 +23,7 @@ export class TgmissionsService {
 
                 await this.registerService.update({
                     ...this.warriorDto,
-                    xp: this.warriorDto.xp + 20
+                    xp: this.warriorDto.xp + 10
                 });
 
                 await ctx.reply(description);

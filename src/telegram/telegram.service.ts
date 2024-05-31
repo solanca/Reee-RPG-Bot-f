@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectBot } from 'nestjs-telegraf';
 import { Markup, Telegraf, Context } from 'telegraf';
-import { commands, walletRedirectURL } from './telegram.constants';
+import { commands } from './telegram.constants';
 import { WarriorDto } from 'src/modules/register/dto/warrior.dto';
 import { TgmissionsService } from './missions/tgmissions.service';
 import { RegisterService } from 'src/modules/register/register.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TelegramService {
@@ -12,7 +13,9 @@ export class TelegramService {
     warriorMap = new Map<string, WarriorDto>();
 
     constructor(@InjectBot() private readonly bot: Telegraf, 
-        private readonly tgmissionsService: TgmissionsService, private readonly registerService: RegisterService) {
+        private readonly tgmissionsService: TgmissionsService, 
+        private readonly registerService: RegisterService,
+        private readonly configService: ConfigService) {
         this.initBot();
     }
 
@@ -21,7 +24,7 @@ export class TelegramService {
         this.bot.command('start', async (ctx) => {
             this.context = ctx;
             await ctx.reply('Please use the link below to connect your wallet:');
-            await ctx.replyWithHTML(walletRedirectURL);
+            await ctx.replyWithHTML(this.configService.get<string>('HOST_URL'));
 
             // ### Referrence
             // await ctx.reply(message, mainMenu)
