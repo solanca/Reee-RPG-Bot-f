@@ -6,6 +6,7 @@ import { WarriorDto } from 'src/modules/register/dto/warrior.dto';
 import { TgmissionsService } from './missions/tgmissions.service';
 import { RegisterService } from 'src/modules/register/register.service';
 import { ConfigService } from '@nestjs/config';
+import { mainMenu } from './telegram.menus';
 
 @Injectable()
 export class TelegramService {
@@ -24,8 +25,18 @@ export class TelegramService {
         this.bot.telegram.setMyCommands(commands);
         this.bot.command('start', async (ctx) => {
             this.context = ctx;
-            await ctx.reply('Please use the link below to connect your wallet:');
-            await ctx.replyWithHTML(this.configService.get<string>('HOST_URL'));
+            // await ctx.reply('Please use the link below to connect your wallet:');
+            // await ctx.replyWithHTML(this.configService.get<string>('HOST_URL'));
+
+            await ctx.replyWithPhoto(this.configService.get<string>('BANNER_URL'), { 
+                caption: `Welcome to REEE Game, @! 👋 \n\n` 
+                        + `Jump in our REEE Game and farm $GAME tokens, just open game and go on!\n\n`
+                        + `💠 Your mined $GAME tokens will be unlocked in: 166.63 hours\m\n`
+                        + `✳️ Your final withdraw multiplier: x1.0015\n\n`
+                        + `You can decrease your unlock time and boost your final tokens multiplier just holding $GAME!\n\n`
+                        + `More $GAME you hold, faster and more tokens you will get!`, 
+                reply_markup: mainMenu.reply_markup
+            })
 
             // ### Referrence
             // await ctx.reply(message, mainMenu)
@@ -66,7 +77,7 @@ export class TelegramService {
         if (warrior !== null && warrior !== undefined) {
             await this.registerService.create({...warrior, owner: this.owner});
             // Update mission bot warrior
-            this.tgmissionsService.warriorDto = warrior;
+            this.tgmissionsService.warriorDto = {...warrior, owner: this.owner};
             await ctx.reply('You just selected Warrior. Below is warrior info:');
             await ctx.replyWithPhoto(warrior.image.replace('?ext=png',''), {
                 caption: `${warrior.description} \n\nExpreience: ${warrior.xp} \nLevel: ${warrior.level} \nWepon: ${warrior.weapon} \nArmor: ${warrior.armor}`

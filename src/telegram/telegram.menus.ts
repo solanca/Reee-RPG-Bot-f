@@ -1,8 +1,13 @@
 import { Markup } from "telegraf";
 
-// export const mainMenu = Markup.keyboard([
-//     ['/connect_wallet']
-// ])
+export const mainMenu = Markup.inlineKeyboard([
+    [Markup.button.url('Open Game', 't.me/ReeeTmpBot/rgwa_999')],
+    [Markup.button.callback(`Leaderboards`, `leaderboards`)],
+    [Markup.button.callback(`Profile`, `profile`), 
+    Markup.button.callback(`Referral`, `referral`)],
+    [Markup.button.callback(`Telegram`, `telegram`), 
+    Markup.button.callback(`Twitter`, `twitter`)],
+])
 
 // const { Markup } = require('telegraf')
 
